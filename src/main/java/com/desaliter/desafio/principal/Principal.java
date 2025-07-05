@@ -167,7 +167,7 @@ public class Principal {
 
         for (LibroDTO libroDTO : librosDTOS) {
             if (libroDTO.getTitulo().toLowerCase().contains(tituloBuscado.toLowerCase())) {
-                System.out.println("\n¡Coincidencia encontrada en los resultados de la API!");
+                System.out.println("\n¡Primera Coincidencia encontrada en los resultados de la API!");
                 System.out.println("            ----------------------- ");
                 System.out.println("Libro encontrado: '" + libroDTO.getTitulo() + "'");
                 System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
@@ -183,20 +183,19 @@ public class Principal {
                 System.out.println("------------------------------------------");
                 System.out.println("\n¿Qué quieres hacer con éste libro?");
                 System.out.println("1. Guardar en la base de datos");
-                System.out.println("2. Busqueda más específica(sin guardar)");
+                System.out.println("2. Busqueda más específica");
                 System.out.print("Ingresá tu opción: ");
 
-                String opcionAccionStr = teclado.nextLine();
-                int opcionAccion;
+                String opcionAccion = teclado.nextLine();
+                int opcionAccion1;
                 try {
-                    opcionAccion = Integer.parseInt(opcionAccionStr);
+                    opcionAccion1 = Integer.parseInt(opcionAccion);
                 } catch (NumberFormatException e) {
                     System.out.println("Opción inválida. Volviendo al menú principal.");
                     return;
                 }
 
-                if (opcionAccion == 1) {
-                    // Lógica para guardar el libro
+                if (opcionAccion1 == 1) {
                     Optional<Libro> libroExiste = libroService.findByTitle(libroDTO.getTitulo());
 
                     if (libroExiste.isPresent()) {
@@ -231,7 +230,7 @@ public class Principal {
                                     })
                                     .collect(Collectors.toList());
 
-                            libro.setAutor(autoresEntidad.isEmpty() ? null : autoresEntidad.get(0)); // Asigna la lista completa de autores
+                            libro.setAutor(autoresEntidad.isEmpty() ? null : autoresEntidad.get(0));
                         } else {
                             System.out.println("Advertencia: Libro '" + libroDTO.getTitulo() + "' sin información de autor en la API.");
                             libro.setAutor(new Autor());
@@ -240,11 +239,11 @@ public class Principal {
 
                         System.out.println(libroGuardadoEnDB);
 
-                        System.out.println(" (ID_GUTENDEX: " + libroDTO.getId_libro() + ") -> " + libro.getTitulo() + " guardado en la base de datos.");
+                        System.out.println(" (ID_GUTENDEX: " + libroDTO.getId_libro() + ") -> ' " + libro.getTitulo() + "' guardado en la base de datos.");
                         libroGuardado = true;
                         break;
                     }
-                } else if (opcionAccion == 2) {
+                } else if (opcionAccion1 == 2) {
                     System.out.println("Volviendo al menú principal sin guardar el libro.");
                     return;
                 } else {
@@ -254,10 +253,6 @@ public class Principal {
                 }
             }
         }
-            if (!libroGuardado) {
-                System.out.println("La Palabra Clave del Título: '" + tituloBuscado + "'es muy genérica!.");
-                System.out.println("Si el libro que buscas está en la lista de arriba, intenta una búsqueda más exacta o elige la opción 2.");
-            }
 
         }
 
