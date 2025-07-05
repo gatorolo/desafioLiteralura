@@ -53,14 +53,14 @@ public class Principal {
         int option;
 
         do {
-             System.out.println("    --------------------------------------------------------");
-             System.out.println("***************Ingresa la opción que deseas***************\n");
-             System.out.println("--------------->1. Buscar Libro por Titulo");
-             System.out.println("--------------->2. Listar por Libros");
-             System.out.println("--------------->3. Buscar Por Autores");
-             System.out.println("--------------->4. Buscar Autores vivos en Determinado Año");
-             System.out.println("--------------->5. Buscar Libro por Idioma");
-             System.out.println("--------------->9. Salir");
+            System.out.println("    --------------------------------------------------------");
+            System.out.println("***************Ingresa la opción que deseas***************\n");
+            System.out.println("--------------->1. Buscar Libro por Titulo");
+            System.out.println("--------------->2. Listar por Libros");
+            System.out.println("--------------->3. Buscar Por Autores");
+            System.out.println("--------------->4. Buscar Autores vivos en Determinado Año");
+            System.out.println("--------------->5. Buscar Libro por Idioma");
+            System.out.println("--------------->9. Salir");
 
             try {
                 option = teclado.nextInt();
@@ -73,7 +73,7 @@ public class Principal {
                         listarLibros();
                         break;
                     case 3:
-                       buscarAutorPorNombre();
+                        buscarAutorPorNombre();
                         break;
                     case 4:
                         System.out.println("falta");
@@ -98,29 +98,29 @@ public class Principal {
 
     private void buscarAutorPorNombre() {
 
-            System.out.println("Ingrese el nombre completo o parcial del autor:");
-            String nombreAutor = teclado.nextLine();
+        System.out.println("Ingrese el nombre completo o parcial del autor:");
+        String nombreAutor = teclado.nextLine();
 
-            List<Autor> autores = autorService.getAllAuthors().stream()
-                    .filter(autor -> autor.getNombre().toLowerCase().contains(nombreAutor.toLowerCase()))
-                    .collect(Collectors.toList());
+        List<Autor> autores = autorService.getAllAuthors().stream()
+                .filter(autor -> autor.getNombre().toLowerCase().contains(nombreAutor.toLowerCase()))
+                .collect(Collectors.toList());
 
-            if (autores.isEmpty()) {
-                System.out.println("No se encontró ningún autor con esa palabra clave en el nombre.");
-            } else {
-                System.out.println("\n--- Autores encontrados ---");
-                autores.forEach(autor -> {
-                    System.out.println("ID: " + autor.getId());
-                    System.out.println("Nombre: " + autor.getNombre());
-                    System.out.println("Nacimiento: " + (autor.getNacimiento() != null ? autor.getNacimiento() : "N/A"));
-                    System.out.println("Fallecimiento: " + (autor.getFallecimiento() != null ? autor.getFallecimiento() : "N/A"));
+        if (autores.isEmpty()) {
+            System.out.println("No se encontró ningún autor con esa palabra clave en el nombre.");
+        } else {
+            System.out.println("\n--- Autores encontrados ---");
+            autores.forEach(autor -> {
+                System.out.println("ID: " + autor.getId());
+                System.out.println("Nombre: " + autor.getNombre());
+                System.out.println("Nacimiento: " + (autor.getNacimiento() != null ? autor.getNacimiento() : "N/A"));
+                System.out.println("Fallecimiento: " + (autor.getFallecimiento() != null ? autor.getFallecimiento() : "N/A"));
 
-                    if (autor.getLibros() != null && !autor.getLibros().isEmpty()) {
-                        System.out.println("  Libros: " + autor.getLibros().stream().map(Libro::getTitulo).collect(Collectors.joining(", ")));
-                    }
-                    System.out.println("----------------------------------------");
-                });
-            }
+                if (autor.getLibros() != null && !autor.getLibros().isEmpty()) {
+                    System.out.println("  Libros: " + autor.getLibros().stream().map(Libro::getTitulo).collect(Collectors.joining(", ")));
+                }
+                System.out.println("----------------------------------------");
+            });
+        }
 
     }
 
@@ -172,10 +172,13 @@ public class Principal {
                 System.out.println("Libro encontrado: '" + libroDTO.getTitulo() + "'");
                 System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
                 System.out.println("Descargas: " + libroDTO.getNumeroDescargas());
+
                 if (libroDTO.getAutores() != null && !libroDTO.getAutores().isEmpty()) {
                     System.out.println("Autor(es): " + libroDTO.getAutores().stream()
                             .map(AutorDTO::getNombre)
                             .collect(Collectors.joining(", ")));
+                    System.out.println("--------------------------------");
+                    System.out.println("Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas especifica -> OPCIÖN 2");
                 }
                 System.out.println("------------------------------------------");
                 System.out.println("\n¿Qué quieres hacer con éste libro?");
@@ -193,6 +196,7 @@ public class Principal {
                 }
 
                 if (opcionAccion == 1) {
+                    // Lógica para guardar el libro
                     Optional<Libro> libroExiste = libroService.findByTitle(libroDTO.getTitulo());
 
                     if (libroExiste.isPresent()) {
@@ -222,25 +226,33 @@ public class Principal {
                                             nuevoAutor.setNombre(autorDTO.getNombre());
                                             nuevoAutor.setNacimiento(autorDTO.getNacimiento());
                                             nuevoAutor.setFallecimiento(autorDTO.getFallecimiento());
-
                                             return autorRepository.save(nuevoAutor);
                                         }
                                     })
                                     .collect(Collectors.toList());
-                            libro.setAutor(autoresEntidad.get(0));
+
+                            libro.setAutor(autoresEntidad.isEmpty() ? null : autoresEntidad.get(0)); // Asigna la lista completa de autores
                         } else {
                             System.out.println("Advertencia: Libro '" + libroDTO.getTitulo() + "' sin información de autor en la API.");
+                            libro.setAutor(new Autor());
                         }
                         System.out.println(libro);
 
                         libroService.saveBook(libro);
-                        System.out.println(" (ID_GUTENDEX:" + " " + libroDTO.getId_libro() + ") ->  " + "Libro '" + libro.getTitulo() + "'" + " ," + "Languge: " + libro.getIdioma() + " ," + "Descargas: " + libro.getDescargas() + " " + " Autor: " + libro.getAutor() + " ' encontrado en la API y guardado en la base de datos.");
+
+                        System.out.println(" (ID_GUTENDEX: " + libroDTO.getId_libro() + ") -> " + libro.getTitulo() + " guardado en la base de datos.");
                         libroGuardado = true;
                         break;
                     }
+                } else if (opcionAccion == 2) {
+                    System.out.println("Volviendo al menú principal sin guardar el libro.");
+                    return;
+                } else {
+                    System.out.println("Opción inválida. Volviendo al menú principal.");
+                    return;
                 }
             }
-
+        }
             if (!libroGuardado) {
                 System.out.println("La Palabra Clave del Título: '" + tituloBuscado + "'es muy genérica!.");
                 System.out.println("Si el libro que buscas está en la lista de arriba, intenta una búsqueda más exacta o elige la opción 2.");
@@ -250,4 +262,5 @@ public class Principal {
 
     }
 
-}
+
+

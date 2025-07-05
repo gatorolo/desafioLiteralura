@@ -34,7 +34,7 @@ public class Autor {
     public String toString() {
         return
                 " nombre='" + nombre + '\'' +
-                ", nacimiento=" + nacimiento +
-                ", fallecimiento=" + fallecimiento;
+                        ", nacimiento=" + nacimiento +
+                        ", fallecimiento=" + fallecimiento;
     }
 }

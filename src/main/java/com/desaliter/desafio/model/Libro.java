@@ -1,7 +1,11 @@
+
+
 package com.desaliter.desafio.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter @Setter
 @AllArgsConstructor
@@ -15,7 +19,6 @@ public class Libro {
     private Long id;
     private String titulo;
     private String idioma;
-    private String genero;
     private int descargas;
 
     @ManyToOne
@@ -28,9 +31,7 @@ public class Libro {
                 "id=" + id +
                 ", titulo='" + titulo + '\'' +
                 ", idioma='" + idioma + '\'' +
-                ", genero='" + genero + '\'' +
                 ", descargas=" + descargas +
                 ", autor=" + autor ;
     }
 }
-

@@ -17,7 +17,6 @@ public class LibroDTO {
     @JsonAlias("title") String titulo;
     @JsonAlias("authors") List<AutorDTO> autores;
     @JsonAlias("languages") List<String> idiomas;
-    @JsonAlias("bookshelves") List<String> generos;
     @JsonAlias("download_count") int numeroDescargas;
 
     @Override
@@ -27,7 +26,6 @@ public class LibroDTO {
                 ", titulo='" + titulo + '\'' +
                 ", autores=" + autores +
                 ", idiomas=" + idiomas +
-                ", generos=" + generos +
                 ", numeroDescargas=" + numeroDescargas +
                 '}';
     }
