@@ -183,7 +183,7 @@ public class Principal {
                 System.out.println("------------------------------------------");
                 System.out.println("\n¿Qué quieres hacer con éste libro?");
                 System.out.println("1. Guardar en la base de datos");
-                System.out.println("2. Elegir Otro de la Lista de Arriba(sin guardar)");
+                System.out.println("2. Busqueda más específica(sin guardar)");
                 System.out.print("Ingresá tu opción: ");
 
                 String opcionAccionStr = teclado.nextLine();
@@ -236,9 +236,9 @@ public class Principal {
                             System.out.println("Advertencia: Libro '" + libroDTO.getTitulo() + "' sin información de autor en la API.");
                             libro.setAutor(new Autor());
                         }
-                        System.out.println(libro);
+                        Libro libroGuardadoEnDB = libroService.saveBook(libro);
 
-                        libroService.saveBook(libro);
+                        System.out.println(libroGuardadoEnDB);
 
                         System.out.println(" (ID_GUTENDEX: " + libroDTO.getId_libro() + ") -> " + libro.getTitulo() + " guardado en la base de datos.");
                         libroGuardado = true;
@@ -248,6 +248,7 @@ public class Principal {
                     System.out.println("Volviendo al menú principal sin guardar el libro.");
                     return;
                 } else {
+                    System.out.println("-----------------");
                     System.out.println("Opción inválida. Volviendo al menú principal.");
                     return;
                 }
