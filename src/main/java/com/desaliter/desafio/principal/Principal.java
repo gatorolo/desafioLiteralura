@@ -76,7 +76,7 @@ public class Principal {
                         buscarAutorPorNombre();
                         break;
                     case 4:
-                        System.out.println("falta");
+                        buscarAutoresVivosEnAnio();
                         break;
                     case 5:
                         System.out.println("falta");
@@ -95,6 +95,43 @@ public class Principal {
         } while (option != 9);
         teclado.close();
     }
+
+    private void buscarAutoresVivosEnAnio() {
+        System.out.println("Ingrese un Año Positivo:");
+              var anio = teclado.nextInt();
+
+            List<Autor> autores = autorService.getAllAuthors();
+
+            List<Autor> autoresVivos = autores.stream()
+                    .filter(autor -> {
+                        return autor.getNacimiento() != null && autor.getNacimiento() <= anio &&
+                                (autor.getFallecimiento() == null || autor.getFallecimiento() >= anio);
+                    })
+                    .collect(Collectors.toList());
+
+
+            if (autoresVivos.isEmpty()) {
+                System.out.println("\nNo se encontraron autores vivos en el año " + anio + ".");
+            } else {
+                System.out.println("\n--- Autores vivos en el año " + anio + " ---");
+                autoresVivos.forEach(autor -> {
+                    System.out.println("------------------------------------------");
+                    System.out.println("Nombre: " + autor.getNombre());
+                    System.out.println("Año de Nacimiento: " + (autor.getNacimiento() != null ? autor.getNacimiento() : "N/A"));
+                    System.out.println("Año de Fallecimiento: " + (autor.getFallecimiento() != null ? autor.getFallecimiento() : "N/A"));
+
+                    if (autor.getLibros() != null && !autor.getLibros().isEmpty()) {
+                        System.out.println("Libros: " + autor.getLibros().stream()
+                                .map(Libro::getTitulo)
+                                .collect(Collectors.joining("; ")));
+                    } else {
+                        System.out.println("Libros: No disponibles o no asociados.");
+                    }
+                    System.out.println("------------------------------------------");
+                });
+            }
+        }
+
 
     private void buscarAutorPorNombre() {
 
@@ -178,7 +215,7 @@ public class Principal {
                             .map(AutorDTO::getNombre)
                             .collect(Collectors.joining(", ")));
                     System.out.println("--------------------------------");
-                    System.out.println("Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas especifica -> OPCIÖN 2");
+                    System.out.println("Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas específica -> OPCIÖN 2");
                 }
                 System.out.println("------------------------------------------");
                 System.out.println("\n¿Qué quieres hacer con éste libro?");
