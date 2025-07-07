@@ -79,7 +79,7 @@ public class Principal {
                         buscarAutoresVivosEnAnio();
                         break;
                     case 5:
-                        System.out.println("falta");
+                       buscarLibroPorIdioma();
                         break;
                     case 9:
                         System.out.println("Gracias por utilizar Gutendex-Alura-On-line");
@@ -94,6 +94,173 @@ public class Principal {
             }
         } while (option != 9);
         teclado.close();
+    }
+
+    private void buscarLibroPorIdioma() {
+        System.out.println("\n----------------------------------");
+        System.out.println("\n--- Buscar Libro por Idioma ---");
+        System.out.println("Ingresá el código del idioma ('es' para español, 'en' para inglés, 'fr' para francés, 'sl' para Eslovaco etc.):");
+        String idioma = teclado.nextLine().toLowerCase();
+
+        boolean encontradosEnBD = false;
+
+        System.out.println("\nBuscando libros en la base de datos local para el idioma '" + idioma + "'...");
+        List<Libro> librosEnBD = libroService.findByLanguage(idioma);
+
+        if (librosEnBD != null && !librosEnBD.isEmpty()) {
+            encontradosEnBD = true;
+            System.out.println("\n--- Libros encontrados en la base de datos local para el idioma '" + idioma + "' ---");
+            librosEnBD.forEach(libro -> {
+                System.out.println("------------------------------------------");
+                System.out.println("Título: " + libro.getTitulo());
+                System.out.println("Autor: " + (libro.getAutor() != null ? libro.getAutor().getNombre() : "N/A"));
+                System.out.println("Idioma: " + libro.getIdioma());
+                System.out.println("Descargas: " + libro.getDescargas());
+                System.out.println("------------------------------------------");
+            });
+        } else {
+            System.out.println("No se encontraron libros en la base de datos local para el idioma '" + idioma + "'.");
+        }
+
+        System.out.println("\n¿Querés buscar en la API de Gutendex también?🙄");
+        System.out.println("1. Sí, buscar en la API✔");
+        System.out.println("2. No, volver al menú principal❌");
+        System.out.print("Ingresá tu opción: ");
+
+        String opcionAPI2 = teclado.nextLine();
+        int opcionAPI;
+        try {
+            opcionAPI = Integer.parseInt(opcionAPI2);
+        } catch (NumberFormatException e) {
+            System.out.println("Opción inválida. Volviendo al menú principal.");
+            return;
+        }
+
+        if (opcionAPI == 1) {
+            System.out.println("\nBuscando libros en la API de Gutendex para el idioma '" + idioma + "'...");
+            String json = consumoApi.obtenerDatos(BASE_URL + "?languages=" + idioma);
+            DatosRespuestaDTO respuestaDTO = conversor.obenerDatos(json, DatosRespuestaDTO.class);
+
+            List<LibroDTO> librosAPI = respuestaDTO.getResults();
+
+            if (librosAPI == null || librosAPI.isEmpty()) {
+                System.out.println("No se encontraron libros en la API de Gutendex para el idioma '" + idioma + "'.");
+                return;
+            }
+
+            System.out.println("\n--- Libros encontrados en la API de Gutendex para el idioma '" + idioma + "' ---\n");
+
+
+            librosAPI.forEach(libroDTO -> {
+                System.out.println("- Título: " + libroDTO.getTitulo() + " (Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "Sin resultados") + ")");
+            });
+            System.out.println("-----------------------------------------------------------------\n");
+
+            boolean libroGuardado = false;
+            boolean salirDelBucleAPI = false;
+
+            for (LibroDTO libroDTO : librosAPI) {
+                System.out.println("\n--- Coincidencia encontrada en los resultados de la API para '" + libroDTO.getTitulo() + "' ---");
+                System.out.println("            ----------------------- ");
+                System.out.println("Título: '" + libroDTO.getTitulo() + "'");
+                System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
+                System.out.println("Descargas: " + libroDTO.getNumeroDescargas());
+
+                if (libroDTO.getAutores() != null && !libroDTO.getAutores().isEmpty()) {
+                    System.out.println("Autor(es): " + libroDTO.getAutores().stream()
+                            .map(AutorDTO::getNombre)
+                            .collect(Collectors.joining(", ")));
+                }
+                System.out.println("------------------------------------------");
+
+                System.out.println("\n¿Qué querés hacer con este libro?");
+                System.out.println("1. Guardar en la base de datos✔");
+                System.out.println("2. Ver el siguiente libro de la lista (sin guardar)🧩");
+                System.out.println("3. Volver al menú principal❌");
+                System.out.print("Ingresá tu opción: ");
+
+                String opcionAccionStr = teclado.nextLine();
+                int opcionAccion;
+                try {
+                    opcionAccion = Integer.parseInt(opcionAccionStr);
+                } catch (NumberFormatException e) {
+                    System.out.println("Opción inválida. Volviendo al menú principal.");
+                    salirDelBucleAPI = true;
+                    break;
+                }
+
+                if (opcionAccion == 1) {
+                    Optional<Libro> libroExiste = libroService.findByTitle(libroDTO.getTitulo());
+
+                    if (libroExiste.isPresent()) {
+                        System.out.println("Libro '" + libroExiste.get().getTitulo() + "' ya está registrado en la base de datos.");
+                    } else {
+                        Libro libro = new Libro();
+                        libro.setTitulo(libroDTO.getTitulo());
+                        libro.setDescargas(libroDTO.getNumeroDescargas());
+
+                        if (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty()) {
+                            libro.setIdioma(libroDTO.getIdiomas().get(0));
+                        } else {
+                            libro.setIdioma("Desconocido");
+                        }
+
+                        if (libroDTO.getAutores() != null && !libroDTO.getAutores().isEmpty()) {
+                            List<Autor> autoresEntidad = libroDTO.getAutores().stream()
+                                    .map(autorDTO -> {
+                                        Optional<Autor> autorExistente = autorService.findAuthorByName(autorDTO.getNombre());
+                                        if (autorExistente.isPresent()) {
+                                            return autorExistente.get();
+                                        } else {
+                                            Autor nuevoAutor = new Autor();
+                                            nuevoAutor.setNombre(autorDTO.getNombre());
+                                            nuevoAutor.setNacimiento(autorDTO.getNacimiento());
+                                            nuevoAutor.setFallecimiento(autorDTO.getFallecimiento());
+                                            return autorRepository.save(nuevoAutor);
+                                        }
+                                    })
+                                    .collect(Collectors.toList());
+
+
+                            libro.setAutor(autoresEntidad.isEmpty() ? null : autoresEntidad.get(0));
+                        } else {
+                            System.out.println("Advertencia: Libro '" + libroDTO.getTitulo() + "' sin información de autor en la API.");
+                            libro.setAutor(null);
+                        }
+
+                        Libro libroGuardadoEnDB = libroService.saveBook(libro);
+
+                        System.out.println(libroGuardadoEnDB);
+
+                        System.out.println(" (ID_GUTENDEX: " + libroDTO.getId_libro() + ") -> Libro '" + libroGuardadoEnDB.getTitulo() + "' guardado exitosamente.");
+                        libroGuardado = true;
+                    }
+                    salirDelBucleAPI = true;
+                    break;
+                } else if (opcionAccion == 2) {
+                    System.out.println("Continuando con el siguiente libro de la lista...");
+                } else if (opcionAccion == 3) {
+                    System.out.println("Volviendo al menú principal.");
+                    salirDelBucleAPI = true;
+                    break;
+                } else {
+                    System.out.println("Opción inválida. Volviendo al menú principal.");
+                    salirDelBucleAPI = true;
+                    break;
+                }
+            }
+
+            if (!libroGuardado && !salirDelBucleAPI) {
+                System.out.println("No se guardó ningún libro de la lista de resultados de la API.");
+            }
+
+        } else if (opcionAPI == 2) {
+            System.out.println("Volviendo al menú principal.");
+            return;
+        } else {
+            System.out.println("Opción inválida. Volviendo al menú principal.");
+            return;
+        }
     }
 
     private void buscarAutoresVivosEnAnio() {
@@ -196,18 +363,19 @@ public class Principal {
         System.out.println("\n--- Libros encontrados por la API Gutendex para '" + tituloBuscado + "' ---\n");
 
         librosDTOS.forEach(libroDTO -> {
-            System.out.println("- Título: " + libroDTO.getTitulo() + libroDTO.getNumeroDescargas() + " (ID: " + libroDTO.getId_libro() + ")");
+            System.out.println("- Título: " + libroDTO.getTitulo()
+                    + libroDTO.getNumeroDescargas()
+                    + " (ID: " + libroDTO.getId_libro() + ")");
         });
         System.out.println("-----------------------------------------------------------------\n");
-
         boolean libroGuardado = false;
 
         for (LibroDTO libroDTO : librosDTOS) {
             if (libroDTO.getTitulo().toLowerCase().contains(tituloBuscado.toLowerCase())) {
-                System.out.println("\n¡Primera Coincidencia encontrada en los resultados de la API!");
+                System.out.println("Primera Coincidencia encontrada en los resultados de la API!");
                 System.out.println("            ----------------------- ");
                 System.out.println("Libro encontrado: '" + libroDTO.getTitulo() + "'");
-                System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
+                System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "Sin resultados"));
                 System.out.println("Descargas: " + libroDTO.getNumeroDescargas());
 
                 if (libroDTO.getAutores() != null && !libroDTO.getAutores().isEmpty()) {
@@ -215,13 +383,14 @@ public class Principal {
                             .map(AutorDTO::getNombre)
                             .collect(Collectors.joining(", ")));
                     System.out.println("--------------------------------");
-                    System.out.println("Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas específica -> OPCIÖN 2");
+                    System.out.println("❗ Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas específica -> OPCIÖN 2");
                 }
                 System.out.println("------------------------------------------");
-                System.out.println("\n¿Qué quieres hacer con éste libro?");
-                System.out.println("1. Guardar en la base de datos");
-                System.out.println("2. Busqueda más específica");
-                System.out.print("Ingresá tu opción: ");
+                System.out.println("\n ---¿Qué quieres hacer con éste libro?---");
+                System.out.println("              -----------");
+                System.out.println("     1. Guardar en la base de datos✔");
+                System.out.println("     2. Busqueda más específica❌");
+                System.out.print("      Que quieres hacer con el Libro: ");
 
                 String opcionAccion = teclado.nextLine();
                 int opcionAccion1;
@@ -234,7 +403,7 @@ public class Principal {
 
                 if (opcionAccion1 == 1) {
                     Optional<Libro> libroExiste = libroService.findByTitle(libroDTO.getTitulo());
-
+                    System.out.println("                 -------------");
                     if (libroExiste.isPresent()) {
                         System.out.println("Libro '" + libroExiste.get().getTitulo() + "' ya está registrado en la base de datos.");
                         libroGuardado = true;
