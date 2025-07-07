@@ -155,12 +155,11 @@ public class Principal {
                 System.out.println("- Título: " + libroDTO.getTitulo() + " (Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "Sin resultados") + ")");
             });
             System.out.println("-----------------------------------------------------------------\n");
-
             boolean libroGuardado = false;
             boolean salirDelBucleAPI = false;
 
             for (LibroDTO libroDTO : librosAPI) {
-                System.out.println("\n--- Coincidencia encontrada en los resultados de la API para '" + libroDTO.getTitulo() + "' ---");
+                System.out.println("--- Coincidencia encontrada en los resultados de la API para '" + libroDTO.getTitulo() + "' ---");
                 System.out.println("            ----------------------- ");
                 System.out.println("Título: '" + libroDTO.getTitulo() + "'");
                 System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
@@ -172,8 +171,8 @@ public class Principal {
                             .collect(Collectors.joining(", ")));
                 }
                 System.out.println("------------------------------------------");
-
-                System.out.println("\n¿Qué querés hacer con este libro?");
+                System.out.println("\n ---¿Qué quieres hacer con éste libro?---");
+                System.out.println("              -----------");
                 System.out.println("1. Guardar en la base de datos✔");
                 System.out.println("2. Ver el siguiente libro de la lista (sin guardar)🧩");
                 System.out.println("3. Volver al menú principal❌");
