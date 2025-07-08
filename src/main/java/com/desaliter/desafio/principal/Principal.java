@@ -392,7 +392,8 @@ public class Principal {
                             .map(AutorDTO::getNombre)
                             .collect(Collectors.joining(", ")));
                     System.out.println("--------------------------------");
-                    System.out.println("❗ Si No es el libro que buscas y se encuentra en la Lista de arriba has una busqueda mas específica -> OPCIÖN 2");
+                    System.out.println("❗ Si No es el libro que buscas y se encuentra en la Lista de arriba");
+                    System.out.println("          has una busqueda mas específica -> OPCIÖN 2");
                 }
                 System.out.println("------------------------------------------");
                 System.out.println("\n ---¿Qué quieres hacer con éste libro?---");
