@@ -56,7 +56,7 @@ public class Principal {
             System.out.println("    --------------------------------------------------------");
             System.out.println("***************Ingresa la opción que deseas***************\n");
             System.out.println("--------------->1. Buscar Libro por Titulo");
-            System.out.println("--------------->2. Listar por Libros");
+            System.out.println("--------------->2. Listar todos Libros ");
             System.out.println("--------------->3. Buscar Por Autores");
             System.out.println("--------------->4. Buscar Autores vivos en Determinado Año");
             System.out.println("--------------->5. Buscar Libro por Idioma");
@@ -119,7 +119,7 @@ public class Principal {
                 System.out.println("------------------------------------------");
             });
         } else {
-            System.out.println("No se encontraron libros en la base de datos local para el idioma '" + idioma + "'.");
+            System.out.println("---No se encontraron libros en la base de datos local para el idioma '" + idioma + "'.---");
         }
 
         System.out.println("\n¿Querés buscar en la API de Gutendex también?🙄");
@@ -137,14 +137,14 @@ public class Principal {
         }
 
         if (opcionAPI == 1) {
-            System.out.println("\nBuscando libros en la API de Gutendex para el idioma '" + idioma + "'...");
+            System.out.println("\nBuscando libros en la API de Gutendex para el idioma '" + idioma + "'.....");
             String json = consumoApi.obtenerDatos(BASE_URL + "?languages=" + idioma);
             DatosRespuestaDTO respuestaDTO = conversor.obenerDatos(json, DatosRespuestaDTO.class);
 
             List<LibroDTO> librosAPI = respuestaDTO.getResults();
 
             if (librosAPI == null || librosAPI.isEmpty()) {
-                System.out.println("No se encontraron libros en la API de Gutendex para el idioma '" + idioma + "'.");
+                System.out.println("---No se encontraron libros en la API de Gutendex para el idioma '" + idioma + "'.---");
                 return;
             }
 
