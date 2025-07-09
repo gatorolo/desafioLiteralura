@@ -115,6 +115,7 @@ public class Principal {
         boolean encontradosEnBD = false;
 
         System.out.println("\nBuscando libros en la base de datos local para el idioma '" + idioma + "'...");
+        System.out.println("                      ---------------------");
         List<Libro> librosEnBD = libroService.findByLanguage(idioma);
 
         if (librosEnBD != null && !librosEnBD.isEmpty()) {
@@ -147,6 +148,7 @@ public class Principal {
         }
 
         if (opcionAPI == 1) {
+            System.out.println("            ----------------------");
             System.out.println("\nBuscando libros en la API de Gutendex para el idioma '" + idioma + "'.....");
             String json = consumoApi.obtenerDatos(BASE_URL + "?languages=" + idioma);
             DatosRespuestaDTO respuestaDTO = conversor.obenerDatos(json, DatosRespuestaDTO.class);
@@ -170,7 +172,7 @@ public class Principal {
 
             for (LibroDTO libroDTO : librosAPI) {
                 System.out.println("--- Coincidencia encontrada en los resultados de la API para '" + libroDTO.getTitulo() + "' ---");
-                System.out.println("            ----------------------- ");
+                System.out.println("               ----------------------- ");
                 System.out.println("Título: '" + libroDTO.getTitulo() + "'");
                 System.out.println("Idioma: " + (libroDTO.getIdiomas() != null && !libroDTO.getIdiomas().isEmpty() ? libroDTO.getIdiomas().get(0) : "N/A"));
                 System.out.println("Descargas: " + libroDTO.getNumeroDescargas());
@@ -248,6 +250,7 @@ public class Principal {
                     break;
                 } else if (opcionAccion == 2) {
                     System.out.println("Continuando con el siguiente libro de la lista...");
+                    System.out.println("             --------------------------");
                 } else if (opcionAccion == 3) {
                     System.out.println("Volviendo al menú principal.");
                     salirDelBucleAPI = true;
