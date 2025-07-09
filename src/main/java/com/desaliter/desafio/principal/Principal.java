@@ -53,6 +53,7 @@ public class Principal {
         int option;
 
         do {
+            System.out.println("--------------------------------------------------------------------");
                System.out.print("""          
                        ,--.   ,--.  ,--.                  ,---.  ,--.                      \s
                        |  |   `--',-'  '-. ,---. ,--.--. /  O  \\ |  |,--.,--.,--.--.,--,--.\s
@@ -62,7 +63,7 @@ public class Principal {
                          
                          
                          """);
-            System.out.println("    --------------------------------------------------------");
+            System.out.println("       --------------------------------------------------------");
             System.out.println("***************Ingresa la opción que deseas***************\n");
             System.out.println("--------------->1. Buscar Libro por Titulo");
             System.out.println("--------------->2. Listar todos Libros ");
@@ -345,6 +346,7 @@ public class Principal {
             System.out.println("No hay libros registrados en la base de datos.");
         } else {
             libros.forEach(libro -> {
+                System.out.println("        --------------------");
                 System.out.println("ID: " + libro.getId());
                 System.out.println("Título: " + libro.getTitulo());
                 System.out.println("Autor: " + libro.getAutor());
@@ -365,10 +367,10 @@ public class Principal {
         List<LibroDTO> librosDTOS = respuestaDTO.getResults();
 
         if (librosDTOS == null || librosDTOS.isEmpty()) {
-            System.out.println("No se encontraron libros en la API para la búsqueda: '" + tituloBuscado + "'.");
+            System.out.println("---No se encontraron libros en la API para la búsqueda: '" + tituloBuscado + "'.---");
             return;
         }
-        System.out.println("          ----------------------------------");
+        System.out.println("\n          ----------------------------------");
         System.out.println("\n--- Libros encontrados por la API Gutendex para '" + tituloBuscado + "' ---\n");
 
         librosDTOS.forEach(libroDTO -> {
