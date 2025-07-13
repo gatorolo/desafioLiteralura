@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -67,7 +69,7 @@ public class Principal {
             System.out.println("***************Ingresa la opción que deseas***************\n");
             System.out.println("--------------->1. Buscar Libro por Titulo");
             System.out.println("--------------->2. Listar todos Libros ");
-            System.out.println("--------------->3. Buscar Por Autores");
+            System.out.println("--------------->3. Buscar Por Autor");
             System.out.println("--------------->4. Buscar Autores vivos en Determinado Año");
             System.out.println("--------------->5. Buscar Libro por Idioma");
             System.out.println("--------------->9. Salir");
@@ -321,8 +323,11 @@ public class Principal {
                 .filter(autor -> autor.getNombre().toLowerCase().contains(nombreAutor.toLowerCase()))
                 .collect(Collectors.toList());
 
-        if (autores.isEmpty()) {
-            System.out.println("No se encontró ningún autor con esa palabra clave en el nombre.");
+        Pattern pattern = Pattern.compile(".*[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ].*");
+        Matcher matcher = pattern.matcher(nombreAutor);
+
+        if (autores.isEmpty() || !matcher.matches()) {
+            System.out.println("No se encontró ningún autor con esa palabra clave o fué mal ingresado.");
         } else {
             System.out.println("\n--- Autores encontrados ---");
             autores.forEach(autor -> {
