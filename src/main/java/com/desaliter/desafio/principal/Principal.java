@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Component
 public class Principal {
 
-    // Instanciamos los servicios y repositorios de manera más limpia
     private final ConsumoApi consumoApi = new ConsumoApi();
     private final ConvierteDatos conversor = new ConvierteDatos();
     private final Scanner teclado = new Scanner(System.in);
@@ -48,7 +47,6 @@ public class Principal {
 
     public void mostrarMenu() {
         int option;
-        // Uso de un "box" para el logo y un menú más ordenado
         String logo = """
                ╔════════════════════════════════════════════════════════════════════════════ ═══╗
                ║                                                                                ║
@@ -105,22 +103,18 @@ public class Principal {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("❌ Error: Ingresa un número válido para la opción del menú. ❌");
-                teclado.nextLine(); // Limpiar el buffer del scanner
-                option = -1; // Mantener el bucle activo
+                teclado.nextLine();
+                option = -1;
             }
         } while (option != 9);
         teclado.close();
     }
-
-    // --- LÓGICA DE BÚSQUEDA Y MENSAJES REFINADOS ---
 
     private void buscarLibroPorIdioma() {
         System.out.println("\n--- Búsqueda de Libros por Idioma ---");
         System.out.println("-------------------------------------");
         System.out.println("Ingresá el código del idioma (ej. 'es' para español, 'en' para inglés):");
         String idioma = teclado.nextLine().toLowerCase();
-
-        // 1. Búsqueda en la Base de Datos Local
         System.out.println("\n🔍 Buscando libros en la base de datos local para el idioma '" + idioma + "'...");
         List<Libro> librosEnBD = libroService.findByLanguage(idioma);
 
@@ -131,7 +125,6 @@ public class Principal {
             System.out.println("❌ No se encontraron libros en la base de datos local para este idioma.");
         }
 
-        // 2. Opción de búsqueda en la API
         System.out.println("\n-------------------------------------");
         System.out.println("❓ ¿Quieres buscar también en la API de Gutendex?");
         System.out.println("1. Sí, buscar en la API");
@@ -228,11 +221,8 @@ public class Principal {
         procesarLibrosDesdeAPI(librosDTOS, "titulo");
     }
 
-    // --- MÉTODOS AUXILIARES PARA UN CÓDIGO MÁS LIMPIO Y REUTILIZABLE ---
-
     private void procesarLibrosDesdeAPI(List<LibroDTO> libros, String tipoBusqueda) {
         for (LibroDTO libroDTO : libros) {
-            // Muestra los detalles de cada libro encontrado
             System.out.println("\n-------------------------------------------");
             System.out.println("✨ Coincidencia API: " + libroDTO.getTitulo());
             System.out.println("-------------------------------------------");
@@ -247,8 +237,6 @@ public class Principal {
                 System.out.println("✍️ Autor(es):   No disponible");
             }
             System.out.println("-------------------------------------------");
-
-            // Opciones para el usuario
             System.out.println("--- ¿Qué quieres hacer con este libro? ---");
             System.out.println("1. Guardar en la base de datos ✅");
             System.out.println("2. Ver el siguiente libro ⏭️");
@@ -263,7 +251,6 @@ public class Principal {
                 System.out.println("Volviendo al menú principal...");
                 return;
             }
-            // Si la opción es 2, el bucle continúa
         }
         System.out.println("\n--- Fin de la lista de resultados de la API. ---");
     }
